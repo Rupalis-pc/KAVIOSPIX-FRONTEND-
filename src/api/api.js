@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:4000"; // backend URL
-// export const BASE_URL = "https://kaviospix-backend.vercel.app"; // backend URL
+// const BASE_URL = "http://localhost:4000"; // backend URL
+export const BASE_URL = "https://kaviospix-backend.vercel.app"; // backend URL
 
 const getToken = () => localStorage.getItem("token");
 
@@ -33,7 +33,6 @@ export const getData = async (endpoint) => {
 export const postData = async (endpoint, body) => {
   try {
     const token = getToken();
-    
 
     const response = await axios.post(`${BASE_URL}${endpoint}`, body, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -76,5 +75,4 @@ export const deleteData = async (endpoint) => {
 
 export const shareAlbum = async (albumId, email) => {
   return postData(`/albums/${albumId}/share`, { email });
-  
 };

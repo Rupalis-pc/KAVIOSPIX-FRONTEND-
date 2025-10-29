@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaStar, FaRegStar, FaTrash, FaTag } from "react-icons/fa";
-import { API_URL } from "../pages/Login";
+import { BASE_URL } from "../api/api";
 
 export default function ImageGrid({ images, albumId }) {
   const [imageList, setImageList] = useState([]);
@@ -28,7 +28,7 @@ export default function ImageGrid({ images, albumId }) {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `${API_URL}albums/${albumId}/images/${imageId}/favorite`,
+        `${BASE_URL}/albums/${albumId}/images/${imageId}/favorite`,
         { isFavorite: !currentFav },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -50,7 +50,7 @@ export default function ImageGrid({ images, albumId }) {
     if (!window.confirm("Are you sure you want to delete this image?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API_URL}albums/${albumId}/images/${imageId}`, {
+      await axios.delete(`${BASE_URL}/albums/${albumId}/images/${imageId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -71,7 +71,7 @@ export default function ImageGrid({ images, albumId }) {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        `${API_URL}albums/${albumId}/images/${imageId}/comments`,
+        `${BASE_URL}/albums/${albumId}/images/${imageId}/comments`,
         { comment: commentText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -100,7 +100,7 @@ export default function ImageGrid({ images, albumId }) {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        `${API_URL}albums/${albumId}/images/search?tags=${tagFilter}`,
+        `${BASE_URL}/albums/${albumId}/images/search?tags=${tagFilter}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
