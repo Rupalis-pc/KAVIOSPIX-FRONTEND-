@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+export const API_URL = "https://kaviospix-backend.vercel.app/";
 export default function Login() {
   const { login } = useAuth();
   const [searchParams] = useSearchParams();
@@ -16,7 +17,7 @@ export default function Login() {
   }, [searchParams, login, navigate]);
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:4000/auth/google";
+    window.location.href = `${API_URL}auth/google`;
     // window.location.href = `${BASE_URL}/auth/google`;
   };
 

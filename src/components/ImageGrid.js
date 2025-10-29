@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FaStar, FaRegStar, FaTrash, FaTag } from "react-icons/fa";
+import { API_URL } from "../pages/Login";
 
 export default function ImageGrid({ images, albumId }) {
   const [imageList, setImageList] = useState([]);
@@ -27,7 +28,7 @@ export default function ImageGrid({ images, albumId }) {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:4000/albums/${albumId}/images/${imageId}/favorite`,
+        `${API_URL}albums/${albumId}/images/${imageId}/favorite`,
         { isFavorite: !currentFav },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -49,10 +50,9 @@ export default function ImageGrid({ images, albumId }) {
     if (!window.confirm("Are you sure you want to delete this image?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(
-        `http://localhost:4000/albums/${albumId}/images/${imageId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.delete(`${API_URL}albums/${albumId}/images/${imageId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const updatedList = imageList.filter((img) => img.imageId !== imageId);
       setImageList(updatedList);
@@ -71,7 +71,7 @@ export default function ImageGrid({ images, albumId }) {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        `http://localhost:4000/albums/${albumId}/images/${imageId}/comments`,
+        `${API_URL}albums/${albumId}/images/${imageId}/comments`,
         { comment: commentText },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -100,7 +100,7 @@ export default function ImageGrid({ images, albumId }) {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        `http://localhost:4000/albums/${albumId}/images/search?tags=${tagFilter}`,
+        `${API_URL}albums/${albumId}/images/search?tags=${tagFilter}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
