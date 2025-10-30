@@ -1,26 +1,15 @@
 import { useNavigate } from "react-router-dom";
-import { deleteData, getUserIdFromToken, shareAlbum } from "../api/api";
+import { deleteData, getUserIdFromToken } from "../api/api";
 
-export default function AlbumCard({ album, onEdit }) {
+export default function AlbumCard({ album, onEdit, onShare }) {
   const navigate = useNavigate();
   const userId = getUserIdFromToken();
   const isOwner = album.ownerId === userId;
 
   const handleCardClick = (e) => {
+    // Prevent navigation if clicking a button inside the card
     if (e.target.tagName === "BUTTON" || e.target.closest("button")) return;
     navigate(`/albums/${album.albumId}`);
-  };
-
-  const handleShare = async () => {
-    const email = prompt("Enter email to share with:");
-    if (!email) return;
-
-    const result = await shareAlbum(album.albumId, email);
-    if (result?.message) {
-      alert(`${result.message}`);
-    } else {
-      alert("Failed to share album.");
-    }
   };
 
   const handleDelete = async () => {
@@ -44,12 +33,14 @@ export default function AlbumCard({ album, onEdit }) {
           <button className="btn btn-sm btn-outline-primary" onClick={onEdit}>
             Edit
           </button>
+
           <button
             className="btn btn-sm btn-outline-success"
-            onClick={handleShare}
+            onClick={() => onShare(album)}
           >
             Share
           </button>
+
           <button
             className="btn btn-sm btn-outline-danger"
             onClick={handleDelete}

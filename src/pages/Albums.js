@@ -8,14 +8,33 @@ export default function Albums() {
   const [newAlbum, setNewAlbum] = useState({ name: "", description: "" });
   const [editAlbum, setEditAlbum] = useState(null);
 
+  //users
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [selectedAlbum, setSelectedAlbum] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState("");
+  console.log(selectedAlbum);
+
   // Fetch all albums (owned or shared)
   const fetchAlbums = async () => {
     const data = await getData("/albums");
     if (data) setAlbums(data);
   };
 
+  // Fetch Users
+  const fetchUsers = async () => {
+    const data = await getData("/users");
+    if (data) {
+      console.log("Users fetched:", data);
+      setUsers(data.filter(d => d.name));
+    } else {
+      console.log("No users found or error fetching users");
+    }
+  };
+
   useEffect(() => {
     fetchAlbums();
+    fetchUsers();
   }, []);
 
   const handleChange = (e) => {
@@ -65,6 +84,30 @@ export default function Albums() {
     setShowModal(true);
   };
 
+  const openShareModal = async (album) => {
+    await fetchUsers();
+    setSelectedAlbum(album);
+    setShowShareModal(true);
+  };
+
+  const handleShareAlbum = async (e) => {
+    e.preventDefault();
+    if (!selectedUser) return alert("Please select a user!");
+
+    const result = await postData(`/albums/${selectedAlbum.albumId}/share`, {
+      userId: selectedUser,
+    });
+
+    if (result?.success) {
+      alert("Album shared successfully!");
+      setShowShareModal(false);
+      setSelectedAlbum(null);
+      setSelectedUser("");
+    } else {
+      alert(result?.message || "Failed to share album");
+    }
+  };
+
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center">
@@ -78,7 +121,11 @@ export default function Albums() {
         {albums?.length > 0 ? (
           albums.map((album) => (
             <div key={album.albumId} className="col-md-3 mb-3">
-              <AlbumCard album={album} onEdit={() => openEditModal(album)} />
+              <AlbumCard
+                album={album}
+                onEdit={() => openEditModal(album)}
+                onShare={() => openShareModal(album)}
+              />
             </div>
           ))
         ) : (
@@ -158,6 +205,69 @@ export default function Albums() {
                   </button>
                   <button type="submit" className="btn btn-primary">
                     {editAlbum ? "Update Album" : "Add Album"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showShareModal && (
+        <div
+          className="modal fade show"
+          style={{
+            display: "block",
+            background: "rgba(0,0,0,0.5)",
+            zIndex: 1055,
+          }}
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <form onSubmit={handleShareAlbum}>
+                <div className="modal-header">
+                  <h5 className="modal-title">Share Album</h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => {
+                      setShowShareModal(false);
+                      setSelectedAlbum(null);
+                      setSelectedUser("");
+                    }}
+                  ></button>
+                </div>
+
+                <div className="modal-body">
+                  <label className="form-label fw-semibold">Select User</label>
+                  <select
+                    className="form-select"
+                    value={selectedUser}
+                    onChange={(e) => setSelectedUser(e.target.value)}
+                  >
+                    <option value="">-- Select a user --</option>
+                    {users.map((user) => (
+                      <option key={user._id} value={user._id}>
+                        {user.name} ({user.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      setShowShareModal(false);
+                      setSelectedAlbum(null);
+                      setSelectedUser("");
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    Share
                   </button>
                 </div>
               </form>
